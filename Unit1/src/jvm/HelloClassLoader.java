@@ -5,7 +5,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class HelloClassLoader extends ClassLoader{
     public static void main(String[] args) throws ClassNotFoundException {
@@ -22,20 +24,23 @@ public class HelloClassLoader extends ClassLoader{
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        String myPath = "file:///Users/tangchenbing/项目/Study/Unit1/resource/jvm/" + name.replace(".","/") + ".class";
+        String myPath = "file:///Users/tangchenbing/IdeaProjects/Study/Unit1/resource/jvm/" + name.replace(".","/") + ".xlass";
         System.out.println(myPath);
         byte[] encodeCLassBytes = null;
-        byte[] decodeClassBytes = null;
+        byte[] decodeCLassBytes = null;
         try {
             Path path = Paths.get(new URI(myPath));
             encodeCLassBytes = Files.readAllBytes(path);
-            Arrays.asList(encodeCLassBytes).forEach(classByte-> {
-                System.out.println(classByte);
-            });
+            decodeCLassBytes = new byte[encodeCLassBytes.length];
+            for(int i = 0; i < encodeCLassBytes.length; i++){
+                byte encodeClassByte = encodeCLassBytes[i];
+                byte decodeClassByte =(byte) (255-encodeClassByte);
+                decodeCLassBytes[i] = decodeClassByte;
+            }
         }catch (Exception ex){
             ex.printStackTrace();
         }
-        Class clazz = defineClass(name, decodeClassBytes, 0, decodeClassBytes.length);
+        Class clazz = defineClass(name, decodeCLassBytes, 0, decodeCLassBytes.length);
         return clazz;
     }
 }
